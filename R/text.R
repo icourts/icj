@@ -1,6 +1,7 @@
 # Functions for text processing including text extraction and
 # construction of paragraph data
 library(xml2)
+library(rvest)
 
 extract_text <- function(x, pdf_column, text_column = 'text', dir = '.'){
 
@@ -41,4 +42,14 @@ prepare_paths <- function(x, pdf_column, root){
     file.path(root, row['case_number'], type, get_filename_from_url(row[pdf_column]))
   }
   )
+}
+
+locate_judgment_start <- function(){
+  jud <- "C:\\Users\\dcg601\\Documents\\142-pdfbox.html"
+  html <- read_html(jud)
+
+  par_texts <- html %>% html_nodes("p") %>% html_text()
+  start <- xml_find_first(html, '//*[contains(text(), "delivers the following Judgment")]')
+  next_ <- xml_find_first(start, 'following::div')
+  next_p <- xml_find_all(n, './/p')
 }

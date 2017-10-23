@@ -13,7 +13,8 @@ JUDGMENTS_URL <- paste0(BASE_URL, "/en/decisions/all/%d/%d/desc")
 TITLE_CSS <- '.docket-odd h4'
 CASE_CSS <- '.docket-odd h5:nth-child(2) a'
 SUBJECT_CSS <- '.docket-odd h5:nth-child(3)'
-FR_PDF <- 'hr+ .docket-odd .btn+ .btn'
+FR_PDF <- '.btn:nth-child(7)'
+FR_PDF_XPATH <- '//a[@class="greybutton-md btn" and contains(text(), "French")]'
 DISSENTING <- '.docket h5 > a'
 ORAL_HEARING_TITLE <- 'h4 a'
 ORAL_HEARING_TITLE_XPATH <- '//div[@class = "docket-odd"]//h4/a'
@@ -53,9 +54,7 @@ load_results <- function(url){
     html_nodes(paste(TITLE_CSS, "a")) %>%
     html_attr("href")
 
-  fr_pdf <- h %>%
-    html_nodes(FR_PDF) %>%
-    html_attr("href")
+  fr_pdf <- get_link_by_selector(h, xpath = FR_PDF_XPATH)
 
   parsed_title <- parse_title(title)
 
@@ -222,10 +221,9 @@ get_oral_proceedings <- function(caseno, url){
   # We distinguish the fact that url might be a file mainly for testing purposes
   if (startsWith(url, 'http')){
     oral_url <- paste0(url, '/oral-proceedings')
+    html <- read_html_with_agent(oral_url)
   } else
-    oral_url <- url
-
-  html <- read_html_with_agent(oral_url)
+    html <- read_html(url)
 
   url_list <- get_link_by_selector(html, xpath = ORAL_HEARING_TITLE_XPATH)
 

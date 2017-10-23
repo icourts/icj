@@ -13,6 +13,9 @@ test_that("load_results brings correct data for the years 1946-1948",
             expect_is(results$date, "Date")
             expect_equal(results[1, "date"], as.Date("1948/12/17"))
             expect_equal(results[1, "case_url"], "/en/case/1")
+            expect_equal(results[1, "en_pdf"], "/files/case-related/1/001-19481217-ORD-01-00-EN.pdf")
+            expect_equal(results[1, "fr_pdf"], "/files/case-related/1/001-19481217-ORD-01-00-FR.pdf")
+            expect_equal(results[2, "fr_pdf"], "/files/case-related/4/004-19481211-ORD-01-00-FR.pdf")
           }
           )
 
