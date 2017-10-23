@@ -1,0 +1,142 @@
+
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(testthat)
+> library(icj)
+> 
+> test_check("icj")
+1. Error: get_decision_data works (@testdownload.R#12) -------------------------
+could not find function "read_html"
+1: get_decision_data(c(2015, 2016)) at testthat/testdownload.R:12
+2: load_results(sprintf(JUDGMENTS_URL, years[1], years[2])) at C:/Users/dcg601/git/icj/R/scrape.R:27
+
+2. Error: Download saves as intended (@testdownload.R#29) ----------------------
+could not find function "stri_split_fixed"
+1: .handleSimpleError(function (e) 
+   {
+       e$call <- sys.calls()[(frame + 11):(sys.nframe() - 2)]
+       register_expectation(e, frame + 11, sys.nframe() - 2)
+       signalCondition(e)
+   }, "could not find function \"stri_split_fixed\"", quote(eval(expr, envir, enclos))) at testthat/testdownload.R:29
+2: eval(expr, envir, enclos)
+
+3. Error: load_results brings correct data for the years 1946-1948 (@testhtml.R#10) 
+could not find function "read_html"
+1: load_results(sprintf(JUDGMENTS_URL, 1946, 1948)) at testthat/testhtml.R:10
+
+4. Error: parse_title parses correctly (@testhtml.R#23) ------------------------
+could not find function "stri_split_regex"
+1: parse_title(example_titles) at testthat/testhtml.R:23
+2: as.data.frame(stri_split_regex(title, "\\sof\\s", simplify = T)) at C:/Users/dcg601/git/icj/R/html.R:102
+
+5. Error: get_dissenting works (@testhtml.R#39) --------------------------------
+could not find function "read_html"
+1: get_dissenting(101, "http://www.icj-cij.org/en/case/101") at testthat/testhtml.R:39
+
+6. Error: get_dissenting with more than one judgments per case (@testhtml.R#48) 
+could not find function "read_html"
+1: get_dissenting(1, "http://www.icj-cij.org/en/case/1") at testthat/testhtml.R:48
+
+7. Error: get dissenting with a case without judgments givs NA (@testhtml.R#63) 
+could not find function "read_html"
+1: get_dissenting(112, "http://www.icj-cij.org/en/case/112") at testthat/testhtml.R:63
+
+8. Error: get_oral_proceedings works (@testhtml.R#68) --------------------------
+could not find function "read_html"
+1: get_oral_proceedings(1, "http://www.icj-cij.org/en/case/1") at testthat/testhtml.R:68
+
+9. Error: get_oral_proceedings in case 150 (@testhtml.R#76) --------------------
+could not find function "read_html"
+1: get_oral_proceedings(150, "http://www.icj-cij.org/en/case/150") at testthat/testhtml.R:76
+
+10. Error: get_oral_proceedings with NA (@testhtml.R#81) -----------------------
+could not find function "read_html"
+1: get_oral_proceedings(165, html) at testthat/testhtml.R:81
+
+11. Error: get by selector functions work (@testhtml.R#86) ---------------------
+could not find function "read_html"
+1: .handleSimpleError(function (e) 
+   {
+       e$call <- sys.calls()[(frame + 11):(sys.nframe() - 2)]
+       register_expectation(e, frame + 11, sys.nframe() - 2)
+       signalCondition(e)
+   }, "could not find function \"read_html\"", quote(eval(expr, envir, enclos))) at testthat/testhtml.R:86
+2: eval(expr, envir, enclos)
+
+12. Error: parse countries works correctly (@testparsing.R#8) ------------------
+could not find function "read_html"
+1: load_results(sprintf(JUDGMENTS_URL, 1946, 1948)) at testthat/testparsing.R:8
+
+13. Error: Intervention works (@testparsing.R#15) ------------------------------
+could not find function "stri_match_last_regex"
+1: expect_equal(parse_countries(intervening)[[2]], "Nicaragua") at testthat/testparsing.R:15
+2: compare(object, expected, ...)
+3: parse_countries(intervening)
+4: str %>% stri_match_last_regex("\\(.*\\)") %>% stri_trim_both(pattern = "[\\p{Letter}\\p{Wspace}]") at C:/Users/dcg601/git/icj/R/html.R:123
+5: withVisible(eval(quote(`_fseq`(`_lhs`)), env, env))
+6: eval(quote(`_fseq`(`_lhs`)), env, env)
+7: eval(expr, envir, enclos)
+8: `_fseq`(`_lhs`)
+9: freduce(value, `_function_list`)
+10: function_list[[i]](value)
+
+14. Error: match_countries works as expected (@testparsing.R#25) ---------------
+could not find function "stri_match_last_regex"
+1: expect_equal(match_states(countries$countries), data.frame(applicant = c("Denmark", 
+       "El Salvador", "Islamic Republic of Iran"), defendant = c("Norway", "Honduras: Nicaragua intervening", 
+       "United States of America"), stringsAsFactors = F)) at testthat/testparsing.R:25
+2: compare(object, expected, ...)
+3: match_states(countries$countries)
+4: as.data.frame(stri_match_last_regex(str, "^(.*)\\s*(v\\.|/)\\s*(.*)", simplify = T)) %>% 
+       select(applicant = V2, defendant = V4) %>% mutate(applicant = stri_trim_both(applicant), 
+       defendant = stri_trim_both(defendant)) %>% transmute(applicant = if_else(grepl("United Kingdom", 
+       applicant), "United Kingdom", applicant), defendant = if_else(grepl("United Kingdom", 
+       defendant), "United Kingdom", defendant)) at C:/Users/dcg601/git/icj/R/html.R:156
+5: eval(lhs, parent, parent)
+6: eval(expr, envir, enclos)
+7: as.data.frame(stri_match_last_regex(str, "^(.*)\\s*(v\\.|/)\\s*(.*)", simplify = T))
+
+15. Error: match_intervening returns with intervention (@testparsing.R#34) -----
+could not find function "stri_match_last_regex"
+1: expect_equal(match_intervening(intervening), c("Nicaragua", NULL)) at testthat/testparsing.R:34
+2: compare(object, expected, ...)
+3: match_intervening(intervening)
+
+16. Error: document_id (@testparsing.R#38) -------------------------------------
+could not find function "stri_split_fixed"
+1: expect_equal(parse_decision_id("http://www.icj-cij.org/files/case-related/101/101-19990325-JUD-01-01-EN.pdf"), 
+       "101-19990325-JUD-01") at testthat/testparsing.R:38
+2: compare(object, expected, ...)
+3: parse_decision_id("http://www.icj-cij.org/files/case-related/101/101-19990325-JUD-01-01-EN.pdf")
+
+testthat results ================================================================
+OK: 6 SKIPPED: 0 FAILED: 16
+1. Error: get_decision_data works (@testdownload.R#12) 
+2. Error: Download saves as intended (@testdownload.R#29) 
+3. Error: load_results brings correct data for the years 1946-1948 (@testhtml.R#10) 
+4. Error: parse_title parses correctly (@testhtml.R#23) 
+5. Error: get_dissenting works (@testhtml.R#39) 
+6. Error: get_dissenting with more than one judgments per case (@testhtml.R#48) 
+7. Error: get dissenting with a case without judgments givs NA (@testhtml.R#63) 
+8. Error: get_oral_proceedings works (@testhtml.R#68) 
+9. Error: get_oral_proceedings in case 150 (@testhtml.R#76) 
+1. ...
+
+Error: testthat unit tests failed
+Execution halted
