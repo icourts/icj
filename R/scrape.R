@@ -44,7 +44,7 @@ get_decision_data <- function(years = c(1946, 2017)){
 
   results_list <- list("cases" = cases,
               "decisions" = results,
-              "oral_proceegins" = proceedings,
+              "oral_proceedings" = proceedings,
               "dissenting_opinions" = dissenting)
 
   return(results_list)
@@ -67,7 +67,7 @@ get_decisions <- function(years = c(1946, 2017), mode = 'all', dir = '.'){
   if (mode == 'all'){
     decision_data <- get_decision_data(years)
     download_files(decision_data$decisions,
-                   decision_data$proceedings,
+                   decision_data$oral_proceedings,
                    decision_data$dissenting,
                    dir)
     return(decision_data)

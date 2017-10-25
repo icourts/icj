@@ -25,13 +25,16 @@ test_that("File creation", {
 
 test_that("Download saves as intended", {
   d <- tempdir()
-  file_url <- "/files/case-related/101/101-19990217-ORA-01-00-BI.pdf"
+  file_url <-
+    "/files/case-related/101/101-19990217-ORA-01-00-BI.pdf"
   file_name <- get_filename_from_url(file_url)
 
   download_file(101, file_url, root_dir = d, sub_dir = "Proceedings")
   expect_true(file.exists(file.path(d, 101, "Proceedings", file_name)))
 
-  expect_message(download_file(101, file_url, root_dir = d, sub_dir = "Proceedings"),
-                 paste(file_name, "already exists, nothing to do ..."))
+  expect_message(
+    download_file(101, file_url, root_dir = d, sub_dir = "Proceedings"),
+    paste(file_name, "already exists, nothing to do ...")
+  )
 
 })
