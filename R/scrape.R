@@ -11,13 +11,13 @@ library(dplyr)
 #' @export
 #'
 #' @examples
-get_decision_data <- function(years = c(1946, 2017)){
+get_decision_data <- function(years = c(2017, 2017)){
 
 
   if (length(years)  != 2) {
     stop("The years parameter should always contain exactly two values")
-  } else if (years[2] <= years[1]){
-    stop("The second year value should be strictly higher than the first")
+  } else if (years[2] < years[1]){
+    stop("The second year value should be strictly higher or equal than the first")
   } else if (years[1] < 1946){
     stop("Wrong start year. The ICJ does not have decisions before 1946")
   }
@@ -62,58 +62,72 @@ get_decision_data <- function(years = c(1946, 2017)){
 #' @export
 #'
 #' @examples
-get_decisions <- function(years = c(1946, 2017), mode = 'all', dir = '.'){
+get_decisions <- function(years = c(1946, 2017), mode = 'all', path = '.'){
 
   if (mode == 'all'){
     decision_data <- get_decision_data(years)
-    download_files(decision_data$decisions,
+    decision_data <- download_files(decision_data$decisions,
                    decision_data$oral_proceedings,
                    decision_data$dissenting,
-                   dir)
+                   path)
+
+
     return(decision_data)
   } else if (mode == 'decisions'){
+
     results <- load_results(url = sprintf(JUDGMENTS_URL, years[1], years[2]))
-    download_files(decisions = results, dir = dir)
+    res <- download_files(decisions = results, path = path)
+    results <- res$decisions
     return(results)
+
   } else
     stop("Unknown mode value")
 }
 
-download_files <- function(decisions, proceedings = NULL, dissenting = NULL, dir = '.'){
+download_files <- function(decisions, proceedings = NULL, dissenting = NULL, path = '.'){
 
-  apply(decisions, 1, function(x) download_decision(x, dir))
+  save_path <- apply(decisions,
+                     1,
+                     function(x)
+                      file.path(path, as.integer(x["case_number"]), file_category_code(x["decision_type"])))
+
+  decisions["local_path"] <- save_path
+
+  apply(decisions, 1, function(x) download_decision(x, x["local_path"]))
+
   if (!is.null(proceedings)){
-    apply(proceedings, 1, function(x) download_file(x["case_number"], x["url"], dir, "Oral Proceedings"))
+    save_path <- lapply(proceedings["case_number"], function(x) file.path(path, as.integer(x), "Oral.proceedings"))
+    proceedings["local_path"] <- save_path
+    apply(proceedings, 1, function(x) download_file(x["url"], x["local_path"]))
   }
 
   if (!is.null(dissenting)){
-    apply(dissenting, 1, function(x) download_file(x["case_number"], x["url"], dir, "Dissenting"))
+    save_path <- lapply(dissenting["case_number"], function(x) file.path(path, as.integer(x), "Dissenting"))
+
+    dissenting["local_path"] <- save_path
+    apply(dissenting, 1, function(x) download_file(x["url"], x["local_path"]))
   }
 
+  return(list(decisions = decisions, proceedings = proceedings, dissenting = dissenting))
 }
 
 download_decision <- function(decision, dir){
-
   for (lang_version in c("en_pdf", "fr_pdf")){
-    download_file( decision["case_number"], decision[lang_version], dir, file_category_code(as.character(decision["decision_type"])))
+    download_file(decision[lang_version], dir)
   }
 
 }
 
-download_file <- function(case_number, file_url, root_dir, sub_dir){
-  path <- create_path(root_dir, case_number, sub_dir)
+download_file <- function(file_url, dir){
 
-  # get the filename from the url
-  local_filename <- get_filename_from_url(file_url)
-
-  local_full_path <- file.path(path, local_filename)
+  local_full_path <- create_path(dir, file_url)
 
   if (file.exists(local_full_path)){
     message(paste(local_full_path, "already exists, nothing to do ..."))
     return()
   }
 
-  message(paste("Downloading", local_filename, "..."))
+  message(paste("Downloading to ", local_full_path, "..."))
   tryCatch( download.file(url = paste0(BASE_URL, file_url),
                 destfile = local_full_path,
                 mode = "wb",
@@ -126,10 +140,14 @@ download_file <- function(case_number, file_url, root_dir, sub_dir){
   )
 }
 
-create_path <- function(root, case_number, file_category="JUD"){
-  new_path <- file.path(root, case_number, file_category)
-  dir.create(new_path, recursive = T)
-  return(new_path)
+create_path <- function(path, file_url){
+  if (!dir.exists(path))
+    dir.create(path, recursive = T)
+
+  local_filename <- get_filename_from_url(file_url)
+
+  local_full_path <- file.path(path, local_filename)
+  return(local_full_path)
 }
 
 file_category_code <- function(type="Judgment"){
@@ -137,6 +155,7 @@ file_category_code <- function(type="Judgment"){
     Judgment = "JUD",
     Order = "ORD",
     `Advisory Opinion` = "ADV",
+    `Advisory opinion` = "ADV",
     Dissenting = "Dissenting",
     `Oral Proceedings` = "Proceedings"
   )
